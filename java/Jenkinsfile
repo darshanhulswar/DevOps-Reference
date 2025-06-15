@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    tools {
+        jdk 'java-11'
+        maven 'maven'
+    }
+
+    stages {
+        stage ('git checkout') {
+            steps {
+                git url: 'https://github.com/darshanhulswar/java-project.git', branch: 'main'
+            }
+        }
+
+        stage ("compile") {
+            steps {
+                sh "mvn compile"
+            }
+        }
+
+        stage ("build") {
+            steps {
+                sh "mvn clean package"
+            }
+        }
+
+        stage ("build image and tage docker file") {
+            steps {
+                sh "docker build -t darshanhulswar/my-java-app:latest ."
+            }
+        }
+
+        stage ("containerization") {
+            steps {
+                sh "docker run -it -d -p 8081:8080 darshanhulswar/my-java-app:latest"
+            }
+        }
+    }
+}
